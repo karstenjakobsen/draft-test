@@ -22,13 +22,24 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v1
 
+      - name: Setup go for tests
+        uses: actions/setup-go@v1.1.1
+        with:
+          go-version: '1.12.5' # The Go version to download (if necessary) and
+
       - name: Build go package
-        run: "test"
+        run: |
+          make all
+
+      - name: Run tests
+        id: go_run_test
+        run: |
+          make run
 
       - name: Docker build
         uses: docker://pasientskyhosting/action-docker-build-push:latest
         with:
-          image_name: pasientskyhosting/ps-otu-ldap
+          image_name: karstenjakobsen/draft-test
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
@@ -38,8 +49,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Check out code
         uses: actions/checkout@v1
+
       - name: dockerfile-linter
         id: dockerfile-linter
         uses: docker://pasientskyhosting/action-dockerfile-linter:latest
@@ -60,22 +73,3 @@ jobs:
         uses: docker://pasientskyhosting/action-golangci-lint:latest
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-
-  golang_test_job:
-
-    name: golang_test_job
-    runs-on: ubuntu-latest
-    steps:
-
-      - name: Check out code
-        uses: actions/checkout@v1
-
-      - name: Setup go for tests
-        uses: actions/setup-go@v1.1.1
-        with:
-          go-version: '1.12.5' # The Go version to download (if necessary) and
-
-      - name: Run tests
-        id: go_run_test
-        run: |
-          go run main.go

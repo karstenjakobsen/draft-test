@@ -1,5 +1,7 @@
 FROM alpine:3.10 as certs
-RUN apk --update add ca-certificates
+
+RUN apk --update add ca-certificates && \
+    rm -rf /var/cache/apk/*
 
 FROM scratch
 ENV PATH=/bin:/go/bin

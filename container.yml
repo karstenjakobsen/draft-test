@@ -1,0 +1,34 @@
+---
+
+
+- name: "Alertmanager Peers"
+  run_once: true
+  tags:
+    - alertmanager
+  set_fact:
+    alertmanager_peers: "{{ alertmanager_peers | default(lookup('template', './alertmanager_peers.j2')) }}"
+
+- debug:
+    msg: "alertmanager_peers: {{ alertmanager_peers }}"
+
+- name: "Alertmanager start command"
+  tags:
+    - alertmanager
+  set_fact:
+    alertmanager__docker_final_cmd: "{{ alertmanager__docker_cmd }} {{ alertmanager_peers }}"
+
+# Container - Alertmanager systemd service
+- name: "Alertmanager | Handle Alertmanager container as service"
+  import_role:
+    name: docker_systemd_service
+  tags:
+    - alertmanager
+  become: true
+  vars:
+    docker_systemd_service__state: "{{ alertmanager__docker_state }}"
+    docker_systemd_service__name: "{{ alertmanager__docker_name }}"
+    docker_systemd_service__env: "{{ alertmanager__docker_env }}"
+    docker_systemd_service__image: "{{ alertmanager__docker_image }}"
+    docker_systemd_service__volumes: "{{ alertmanager__docker_volumes}}"
+    docker_systemd_service__args: "{{ alertmanager__docker_server_args }}"
+    docker_systemd_service__cmd: "{{ alertmanager__docker_final_cmd }}"

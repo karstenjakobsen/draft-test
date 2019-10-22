@@ -4,23 +4,26 @@ name: Integration
 on:
   push:
     branches:
-    - development
+      - development
   pull_request:
     branches:
-    - master
-    - development
+      - master
+      - development
 
 jobs:
 
-  docker_build_job:
+  build_job:
 
-    name: docker_build_job
+    name: build_job
     runs-on: ubuntu-latest
 
     steps:
 
       - name: Check out code
         uses: actions/checkout@v1
+
+      - name: Build go package
+        run: "test"
 
       - name: Docker build
         uses: docker://pasientskyhosting/action-docker-build-push:latest
@@ -65,15 +68,14 @@ jobs:
     steps:
 
       - name: Check out code
-        uses: actions/checkout@v1      
+        uses: actions/checkout@v1
 
       - name: Setup go for tests
         uses: actions/setup-go@v1.1.1
         with:
-          go-version: '1.12.5' # The Go version to download (if necessary) and 
-          
+          go-version: '1.12.5' # The Go version to download (if necessary) and
+
       - name: Run tests
         id: go_run_test
-        run: |          
+        run: |
           go run main.go
-
